@@ -31,7 +31,7 @@ public:
     Matrix operator*(double);
     Matrix operator/(double);
 
-    //Methods
+    //Other methods
     double& operator()(const unsigned &, const unsigned &);
     void print();
     unsigned int getRows();

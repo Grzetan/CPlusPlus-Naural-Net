@@ -3,6 +3,9 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=c++
 
 ### C++ ###
+# IDE files
+.vscode
+
 # Prerequisites
 *.d
 

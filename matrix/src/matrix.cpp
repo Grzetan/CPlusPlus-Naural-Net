@@ -97,7 +97,7 @@ Matrix Matrix::hadamartMultiplication(Matrix &b){
 
 Matrix Matrix::kroneckerMultiplication(Matrix &b){
     Matrix multi(rows*b.getRows(), cols*b.getCols(), 0.0);
-    unsigned i, j, p, q;
+    unsigned int i, j, p, q;
     for(i=0; i<rows; i++){
         for(j=0; j<cols; j++){
             for(p=0; p<b.getRows(); p++){
@@ -134,7 +134,7 @@ Matrix Matrix::yConcatonation(Matrix &b){
 //Scalar operations
 Matrix Matrix::operator+(double scalar){
    Matrix sum(rows, cols, 0.0);
-    unsigned i, j;
+    unsigned int i, j;
     for(i=0; i<rows; i++){
         for(j=0; j<cols; j++){
             sum(i,j) = this->matrix[i][j] + scalar;
@@ -145,7 +145,7 @@ Matrix Matrix::operator+(double scalar){
 
 Matrix Matrix::operator-(double scalar){
     Matrix diff(rows, cols, 0.0);
-    unsigned i, j;
+    unsigned int i, j;
     for(i=0; i<rows; i++){
         for(j=0; j<cols; j++){
             diff(i,j) = this->matrix[i][j] - scalar;
@@ -156,7 +156,7 @@ Matrix Matrix::operator-(double scalar){
 
 Matrix Matrix::operator*(double scalar){
     Matrix multi(rows, cols, 0.0);
-    unsigned i, j;
+    unsigned int i, j;
     for(i=0; i<rows; i++){
         for(j=0; j<cols; j++){
             multi(i,j) = this->matrix[i][j] * scalar;
@@ -167,7 +167,7 @@ Matrix Matrix::operator*(double scalar){
 
 Matrix Matrix::operator/(double scalar){
     Matrix div(rows, cols, 0.0);
-    unsigned i, j;
+    unsigned int i, j;
     for(i=0; i<rows; i++){
         for(j=0; j<cols; j++){
             div(i,j) = this->matrix[i][j] / scalar;
@@ -191,7 +191,7 @@ double& Matrix::operator()(const unsigned int &row, const unsigned int &col){
 
 void Matrix::print(){
     std::cout << "Matrix shape: " << rows << "x" << cols << std::endl;
-    unsigned i, j;
+    unsigned int i, j;
     for(i=0; i<rows; i++){
         for(j=0; j < cols; j++){
             std::cout << this->matrix[i][j] << " ";

@@ -1,18 +1,19 @@
-#include <matrix.h>
 #include <iostream>
 #include <vector>
+#include "matrix.h"
+#include "assets.h"
+
+#define OUTPUT_COUNT 3
 
 int main(){
-    Matrix a(2,2,3.0);
-    Matrix b(2,1,2.0);
+    Matrix a(5,1,0.0);
+    Matrix b(5,1,1.0);
 
     Matrix x = a.yConcatonation(b);
-    a.print();
-    b.print();
+    
+    Matrix xd = output_to_class(x);
     x.print();
-    // M.print();
-    // transposed = matrixlib::transpose(matrix);
-
-    // matrixlib::printMatrix(matrix);
-    // matrixlib::printMatrix(transposed);
+    xd.print();
+    Matrix out = class_to_output(xd, OUTPUT_COUNT);
+    out.print();
 }
