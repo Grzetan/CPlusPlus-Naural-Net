@@ -1,7 +1,7 @@
 #pragma once
 
-#include "matrix.h"
+#include "Tensor.h"
 
-Matrix output_to_class(Matrix &);
+Tensor output_to_class(Tensor &);
 
-Matrix class_to_output(Matrix &, const unsigned int &);
+Tensor class_to_output(Tensor &, const unsigned int &);

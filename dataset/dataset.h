@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <fstream>
-#include "matrix.h"
+#include "Tensor.h"
 
 class IrisDataset{
 private:
@@ -13,23 +13,26 @@ private:
         FIRST_CLASS = 28, SECOND_CLASS = 32, THRIRD_CLASS = 31
     };
 
-    Matrix getSample(unsigned int);
+    Tensor getSample(unsigned int);
 
 public:
-    int INPUT_COUNT;
-    int OUTPUT_COUNT;
-    int TRAIN_COUNT;
-    int TEST_COUNT;
-    int VALIDATION_COUNT;
+    size_t INPUT_COUNT;
+    size_t OUTPUT_COUNT;
+    size_t TRAIN_COUNT;
+    size_t TEST_COUNT;
+    size_t VALIDATION_COUNT;
 
     IrisDataset(const char*);
 
     //Sets
-    Matrix trainingSet(unsigned int);
-    Matrix testSet(unsigned int);
-    Matrix validationSet(unsigned int);
+    Tensor trainingSet(unsigned int);
+    Tensor testSet(unsigned int);
+    Tensor validationSet(unsigned int);
     void closeDataset();
+
+    int classNameToIndex(char *);
 
     //Exception
     void indexOutOfRange();
+    void classNotFound();
 };
