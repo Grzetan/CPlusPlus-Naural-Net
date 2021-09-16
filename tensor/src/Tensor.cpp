@@ -2,12 +2,19 @@
 
 Tensor::Tensor(vector<size_t> _shape, double fill){
     this->shape = _shape;
+    this->generateStrides();
+    this->printStrides();
     totalLength = multiplyArr(shape);
     values.resize(totalLength, fill);
 }
 
-Tensor::Tensor(vector<size_t> _shape, vector<double> _values){
+Tensor::Tensor(vector<size_t> _shape, vector<double> _values, vector<size_t> _strides = {}){
     this->shape = _shape;
+    if(_strides.size() == 0){
+        this->generateStrides();
+    }else{
+        this->strides = _strides;
+    }
     totalLength = multiplyArr(shape);
     if(totalLength == _values.size()){
         values.reserve(totalLength);
@@ -40,9 +47,16 @@ size_t Tensor::complexIndexToLinearIndex(vector<size_t> index){
             this->invalidIndex();
             std::exit(0);
         }
-        realIndex = realIndex + index[i] * multiplyArr(vector<size_t>(shape.begin() + (i + 1), shape.end()));
+        realIndex = realIndex + index[i] * strides[i];
     }
     return realIndex;
+}
+
+void Tensor::generateStrides(){
+    strides.reserve(shape.size());
+    for(int i=0; i<shape.size(); i++){
+        strides.push_back(this->multiplyArr(vector<size_t>(shape.begin() + i + 1, shape.end())));
+    }
 }
 
 //Tensor operations
@@ -63,8 +77,9 @@ Tensor Tensor::operator+(Tensor &b){
 Tensor Tensor::operator-(Tensor &b){
     if(b.getShape() == shape){
         vector<double> vals(totalLength);
+        vector<double> _vals = b.getValues();
         for(unsigned i=0; i<totalLength; i++){
-            vals[i] = values[i] - b.getValues()[i];
+            vals[i] = values[i] - _vals[i];
         }
         return Tensor(shape, vals);
     }else{
@@ -78,10 +93,51 @@ Tensor Tensor::operator-(Tensor &b){
 
 // }
 
-Tensor Tensor::transpose(vector<size_t>){
-    Tensor transposed(*this);
-    
-    return transposed;
+Tensor Tensor::swapaxes(size_t dim1, size_t dim2){
+    //Create new shape
+    vector<size_t> newShape = shape; 
+    newShape[dim2] = shape[dim1];
+    newShape[dim1] = shape[dim2];
+    //Swap values
+    vector<size_t> _strides = strides;
+    _strides[dim1] = strides[dim2];
+    _strides[dim2] = strides[dim1];
+    return Tensor(newShape, values, _strides);
+}
+
+Tensor Tensor::transpose(){
+    vector<size_t> newShape;
+    vector<size_t> newStrides;
+    newShape.reserve(shape.size());
+    newStrides.reserve(strides.size());
+
+    for(int i=shape.size() - 1; i>=0; i--){
+        newShape.push_back(shape[i]);
+        newStrides.push_back(strides[i]);
+    }
+    return Tensor(newShape, values, newStrides);
+}
+
+Tensor Tensor::permute(vector<size_t> dims){
+    if(dims.size() == shape.size()){
+        vector<size_t> newShape;
+        vector<size_t> newStrides;
+        newShape.reserve(shape.size());
+        newStrides.reserve(strides.size());
+        
+        for(unsigned i=0; i<dims.size(); i++){
+            if(dims[i] >= shape.size()){
+                this->invalidIndex();
+                std::exit(0);   
+            }
+            newShape.push_back(shape[dims[i]]);
+            newStrides.push_back(strides[dims[i]]);
+        }
+        return Tensor(newShape, values, newStrides);
+    }else{
+        this->invalidIndex();
+        std::exit(0);
+    }
 }
 
 Tensor Tensor::hadamartProduct(Tensor &b){
@@ -245,6 +301,19 @@ void Tensor::printShape(){
     for(i=0; i<shape.size(); i++){
         std::cout << shape[i];
         if(i < shape.size() - 1){
+            std::cout << " x ";
+        }
+    }
+    std::cout << std::endl << std::endl;
+}
+
+void Tensor::printStrides(){
+    //Print shape
+    unsigned i, j;
+    std::cout << "Tensor strides: ";
+    for(i=0; i<strides.size(); i++){
+        std::cout << strides[i];
+        if(i < strides.size() - 1){
             std::cout << " x ";
         }
     }

@@ -8,6 +8,7 @@ using std::vector;
 class Tensor{
 private:
     vector<size_t> shape;
+    vector<size_t> strides; 
     vector<double> values;
     size_t totalLength;
 
@@ -15,16 +16,20 @@ private:
     void invalidShape();
     void invalidIndex();
     size_t complexIndexToLinearIndex(vector<size_t>);
+    vector<size_t> linearToComplexIndex(size_t);
+    void generateStrides();
 
 public:
-    Tensor(vector<size_t>, vector<double>);
+    Tensor(vector<size_t>, vector<double>, vector<size_t>);
     Tensor(vector<size_t>, double);
 
     //Tensor operations
     Tensor operator+(Tensor &);
     Tensor operator-(Tensor &);
     Tensor operator*(Tensor &);
-    Tensor transpose(vector<size_t>);
+    Tensor swapaxes(size_t, size_t);
+    Tensor transpose();
+    Tensor permute(vector<size_t>);
     Tensor hadamartProduct(Tensor &);
     Tensor kroneckerMultiplication(Tensor &);
     Tensor yConcatonation(Tensor &);
@@ -48,4 +53,5 @@ public:
 
     //Other methods
     void printShape();
+    void printStrides();
 };
