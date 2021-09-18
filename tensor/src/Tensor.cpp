@@ -8,8 +8,9 @@ Tensor::Tensor(vector<size_t> _shape, double fill){
     values.resize(totalLength, fill);
 }
 
-Tensor::Tensor(vector<size_t> _shape, vector<double> _values, vector<size_t> _strides = {}){
+Tensor::Tensor(vector<size_t> _shape, vector<double> _values, vector<size_t> _strides = {}, bool _contiguous = true){
     this->shape = _shape;
+    this->contiguous = _contiguous;
     if(_strides.size() == 0){
         this->generateStrides();
     }else{
@@ -52,11 +53,39 @@ size_t Tensor::complexIndexToLinearIndex(vector<size_t> index){
     return realIndex;
 }
 
+vector<size_t> Tensor::linearToComplexIndex(size_t index){
+    vector<size_t> complex(shape.size());
+    vector<size_t> tempStrides;
+
+    if(!contiguous){
+        tempStrides.reserve(shape.size());
+        for(int i=0; i<shape.size(); i++){
+            tempStrides.push_back(this->multiplyArr(vector<size_t>(shape.begin() + i + 1, shape.end())));
+        }
+    }else{
+        tempStrides = strides;
+    }
+    unsigned leftover = index;
+    for(unsigned i=0; i<shape.size(); i++){
+        complex[i] = leftover / tempStrides[i];
+        leftover = leftover % tempStrides[i];
+    }
+    return complex;
+}
+
 void Tensor::generateStrides(){
     strides.reserve(shape.size());
     for(int i=0; i<shape.size(); i++){
         strides.push_back(this->multiplyArr(vector<size_t>(shape.begin() + i + 1, shape.end())));
     }
+}
+
+vector<double> Tensor::copyValuesByStrides(){
+    vector<double> _values(totalLength);
+    for(unsigned i=0; i<totalLength; i++){
+        _values[i] = this->operator()(this->linearToComplexIndex(i));
+    }
+    return _values;
 }
 
 //Tensor operations
@@ -95,14 +124,14 @@ Tensor Tensor::operator-(Tensor &b){
 
 Tensor Tensor::swapaxes(size_t dim1, size_t dim2){
     //Create new shape
-    vector<size_t> newShape = shape; 
-    newShape[dim2] = shape[dim1];
-    newShape[dim1] = shape[dim2];
+    vector<size_t> _shape = shape; 
+    _shape[dim2] = shape[dim1];
+    _shape[dim1] = shape[dim2];
     //Swap values
     vector<size_t> _strides = strides;
     _strides[dim1] = strides[dim2];
     _strides[dim2] = strides[dim1];
-    return Tensor(newShape, values, _strides);
+    return Tensor(_shape, values, _strides, false);
 }
 
 Tensor Tensor::transpose(){
@@ -115,7 +144,7 @@ Tensor Tensor::transpose(){
         newShape.push_back(shape[i]);
         newStrides.push_back(strides[i]);
     }
-    return Tensor(newShape, values, newStrides);
+    return Tensor(newShape, values, newStrides, false);
 }
 
 Tensor Tensor::permute(vector<size_t> dims){
@@ -133,7 +162,7 @@ Tensor Tensor::permute(vector<size_t> dims){
             newShape.push_back(shape[dims[i]]);
             newStrides.push_back(strides[dims[i]]);
         }
-        return Tensor(newShape, values, newStrides);
+        return Tensor(newShape, values, newStrides, false);
     }else{
         this->invalidIndex();
         std::exit(0);
@@ -190,7 +219,12 @@ Tensor Tensor::hadamartProduct(Tensor &b){
 // }
 
 Tensor Tensor::flatten(){
-    return Tensor({totalLength}, values);
+    vector<double> _values = values;
+    if(!contiguous){
+        std::cout << "NOR";
+        _values = this->copyValuesByStrides();
+    }
+    return Tensor({totalLength}, _values);
 }
 
 Tensor Tensor::reshape(vector<size_t> new_shape){
@@ -198,7 +232,11 @@ Tensor Tensor::reshape(vector<size_t> new_shape){
         this->invalidShape();
         std::exit(0);
     }
-    return Tensor(new_shape, values);
+    vector<double> _values = values;
+    if(!contiguous){
+        _values = this->copyValuesByStrides();
+    }
+    return Tensor(new_shape, _values);
 }
 
 double Tensor::max(){

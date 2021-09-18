@@ -6,21 +6,22 @@
 using std::vector;
 
 class Tensor{
-private:
+public:
     vector<size_t> shape;
     vector<size_t> strides; 
     vector<double> values;
     size_t totalLength;
-
+    bool contiguous = true;
     size_t multiplyArr(vector<size_t>);
     void invalidShape();
     void invalidIndex();
     size_t complexIndexToLinearIndex(vector<size_t>);
     vector<size_t> linearToComplexIndex(size_t);
     void generateStrides();
+    vector<double> copyValuesByStrides();
 
 public:
-    Tensor(vector<size_t>, vector<double>, vector<size_t>);
+    Tensor(vector<size_t>, vector<double>, vector<size_t>, bool);
     Tensor(vector<size_t>, double);
 
     //Tensor operations
