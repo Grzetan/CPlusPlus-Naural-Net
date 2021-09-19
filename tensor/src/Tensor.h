@@ -6,21 +6,23 @@
 using std::vector;
 
 class Tensor{
-public:
+private:
     vector<size_t> shape;
     vector<size_t> strides; 
     vector<double> values;
-    size_t totalLength;
-    bool contiguous = true;
     size_t multiplyArr(vector<size_t>);
     void invalidShape();
     void invalidIndex();
+    void invalidAxis();
     size_t complexIndexToLinearIndex(vector<size_t>);
     vector<size_t> linearToComplexIndex(size_t);
     void generateStrides();
     vector<double> copyValuesByStrides();
 
 public:
+    size_t totalLength;
+    bool contiguous = true;
+
     Tensor(vector<size_t>, vector<double>, vector<size_t>, bool);
     Tensor(vector<size_t>, double);
 
@@ -33,7 +35,7 @@ public:
     Tensor permute(vector<size_t>);
     Tensor hadamartProduct(Tensor &);
     Tensor kroneckerMultiplication(Tensor &);
-    Tensor yConcatonation(Tensor &);
+    Tensor concat(Tensor &, size_t);
     Tensor flatten();
     Tensor reshape(vector<size_t>);
     double max();

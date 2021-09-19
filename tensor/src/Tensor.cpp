@@ -117,10 +117,18 @@ Tensor Tensor::operator-(Tensor &b){
     } 
 }
 
-// Tensor Tensor::operator*(Tensor &b){
-//     Tensor multi(*this);
-
-// }
+Tensor Tensor::operator*(Tensor &b){
+    if(b.getShape() == shape){
+        vector<double> sum_vals(totalLength);
+        for(unsigned i=0; i<totalLength; i++){
+            sum_vals[i] = values[i] * b.getValues()[i];
+        }
+        return Tensor(shape, sum_vals);
+    }else{
+        this->invalidShape();
+        std::exit(0);
+    } 
+}
 
 Tensor Tensor::swapaxes(size_t dim1, size_t dim2){
     //Create new shape
@@ -169,18 +177,18 @@ Tensor Tensor::permute(vector<size_t> dims){
     }
 }
 
-Tensor Tensor::hadamartProduct(Tensor &b){
-    if(b.getShape() == shape){
-        vector<double> sum_vals(totalLength);
-        for(unsigned i=0; i<totalLength; i++){
-            sum_vals[i] = values[i] * b.getValues()[i];
-        }
-        return Tensor(shape, sum_vals);
-    }else{
-        this->invalidShape();
-        std::exit(0);
-    } 
-}
+// Tensor Tensor::hadamartProduct(Tensor &b){
+//     if(b.getShape() == shape){
+//         vector<double> sum_vals(totalLength);
+//         for(unsigned i=0; i<totalLength; i++){
+//             sum_vals[i] = values[i] * b.getValues()[i];
+//         }
+//         return Tensor(shape, sum_vals);
+//     }else{
+//         this->invalidShape();
+//         std::exit(0);
+//     } 
+// }
 
 // Tensor Tensor::kroneckerMultiplication(Tensor &b){
 //     Tensor multi(rows*b.getRows(), cols*b.getCols(), 0.0);
@@ -197,31 +205,50 @@ Tensor Tensor::hadamartProduct(Tensor &b){
 //     return multi;
 // }
 
-// Tensor Tensor::yConcatonation(Tensor &b){
-//     Tensor concat(rows, cols + b.getCols(), 0.0);
-//     unsigned int i, j;
-//     if(rows == b.getRows()){
-//         for(i=0; i<rows; i++){
-//             for(j=0; j<cols; j++){
-//                 concat(i,j) = this->Tensor[i][j];
-//             }
-//         }
-//         for(i=0; i<b.getRows(); i++){
-//             for(j=0; j<b.getCols(); j++){
-//                 concat(i,j+cols) = b(i, j);
-//             }
-//         }
-//         return concat;
-//     }else{
-//         this->invalidShape();
-//         std::exit(0);
-//     }
-// }
+Tensor Tensor::concat(Tensor &b, size_t axis = 0){
+    //Check if axis is valid
+    if(axis < 0 || axis >= shape.size()){
+        this->invalidAxis();
+        std::exit(0);
+    }
+    //Check if tensors can be concatonated
+    unsigned i, j;
+    for(i=0; i<shape.size(); i++){
+        if(shape[i] != b.getShape()[i] && i != axis){
+            this->invalidShape();
+            std::exit(0);
+        }    
+    }
+    //Concatonate tensors
+    vector<size_t> _shape = shape;
+    _shape[axis] += b.getShape()[axis];
+    vector<double> _values;
+    _values.reserve(totalLength + b.totalLength);
+
+    vector<double> copiedValues = values;
+    vector<double> copiedValuesB = b.getValues();
+    if(!contiguous){
+        copiedValues = this->copyValuesByStrides();
+    }
+    if(!b.contiguous){
+        copiedValuesB = b.copyValuesByStrides();
+    }
+
+    size_t step = multiplyArr(vector<size_t>(shape.begin() + axis, shape.end()));
+    for(i=0; i<multiplyArr(vector<size_t>(shape.begin(), shape.begin() + axis)); i++){
+        for(j=i*step; j<i*step+step; j++){
+            _values.push_back(copiedValues[j]);
+        }
+        for(j=i*step; j<i*step+step; j++){
+            _values.push_back(copiedValuesB[j]);
+        }
+    }
+    return Tensor(_shape, _values);
+}
 
 Tensor Tensor::flatten(){
     vector<double> _values = values;
     if(!contiguous){
-        std::cout << "NOR";
         _values = this->copyValuesByStrides();
     }
     return Tensor({totalLength}, _values);
@@ -370,6 +397,15 @@ void Tensor::invalidShape(){
 void Tensor::invalidIndex(){
     try{ 
         throw std::out_of_range("Provided index is not in bounds of specified tensor"); 
+    }
+    catch(std::out_of_range str){
+        std::cout << str.what() << std::endl; 
+    }
+}
+
+void Tensor::invalidAxis(){
+    try{ 
+        throw std::out_of_range("Provided axis is invalid"); 
     }
     catch(std::out_of_range str){
         std::cout << str.what() << std::endl; 
