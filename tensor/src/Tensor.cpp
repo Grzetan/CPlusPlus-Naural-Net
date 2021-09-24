@@ -296,6 +296,21 @@ Tensor Tensor::reshape(vector<size_t> new_shape){
     return Tensor(new_shape, _values);
 }
 
+Tensor Tensor::unsquezze(){
+    vector<double> _values;    
+
+    if(!contiguous){
+        _values = copyValuesByStrides();
+    }else{
+        _values = values;
+    }
+
+    vector<size_t> _shape = shape;
+    _shape.insert(_shape.begin(), 1);
+
+    return Tensor(_shape, _values);
+}
+
 double Tensor::max(){
     double max = values[0];
     for(unsigned i=0; i<totalLength; i++){

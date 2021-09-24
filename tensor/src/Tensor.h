@@ -38,6 +38,7 @@ public:
     Tensor concat(Tensor &, size_t);
     Tensor flatten();
     Tensor reshape(vector<size_t>);
+    Tensor unsquezze();
     double max();
     double min();
 
