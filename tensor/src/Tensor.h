@@ -34,7 +34,7 @@ public:
     Tensor transpose();
     Tensor permute(vector<size_t>);
     Tensor hadamartProduct(Tensor &);
-    Tensor kroneckerMultiplication(Tensor &);
+    Tensor kron(Tensor &);
     Tensor concat(Tensor &, size_t);
     Tensor flatten();
     Tensor reshape(vector<size_t>);

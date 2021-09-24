@@ -3,7 +3,6 @@
 Tensor::Tensor(vector<size_t> _shape, double fill){
     this->shape = _shape;
     this->generateStrides();
-    this->printStrides();
     totalLength = multiplyArr(shape);
     values.resize(totalLength, fill);
 }
@@ -190,20 +189,35 @@ Tensor Tensor::permute(vector<size_t> dims){
 //     } 
 // }
 
-// Tensor Tensor::kroneckerMultiplication(Tensor &b){
-//     Tensor multi(rows*b.getRows(), cols*b.getCols(), 0.0);
-//     unsigned int i, j, p, q;
-//     for(i=0; i<rows; i++){
-//         for(j=0; j<cols; j++){
-//             for(p=0; p<b.getRows(); p++){
-//                 for(q=0; q<b.getCols(); q++){
-//                     multi(i*b.getRows() + p, j*b.getCols() + q) = this->Tensor[i][j] * b(i, j);
-//                 }
-//             }
-//         }
-//     }
-//     return multi;
-// }
+Tensor Tensor::kron(Tensor &b){
+    if(shape.size() == 2 && b.getShape().size() == 2){
+        //Calculate new shape
+        vector<size_t> _shape = shape;
+
+        unsigned i, j, index, index2, lastDimSize = shape[shape.size() - 1], 
+        bLastShape = b.getShape()[b.getShape().size() - 1];
+
+        for(i=0; i<_shape.size(); i++){
+            _shape[i] = _shape[i] * b.getShape()[i];
+        }    
+
+        vector<double> _values;
+        _values.resize(multiplyArr(_shape));
+
+        for(i=0; i<totalLength; i++){
+            index = (int)i/lastDimSize * lastDimSize * b.totalLength;
+            for(j=0; j<b.totalLength; j++){
+                index2 = index + (((int)j / bLastShape) * _shape[_shape.size() - 1]);
+                index2 = index2 + (i%lastDimSize * bLastShape) + j%bLastShape;
+                _values[index2] = values[i] * b.getValues()[j];
+            }
+        }
+        return Tensor(_shape, _values);
+    }else{
+        std::cout << "Kronecker multiplication can be performed only between matrixes" << std::endl;
+        std::exit(0);
+    }
+}
 
 Tensor Tensor::concat(Tensor &b, size_t axis = 0){
     //Check if axis is valid

@@ -7,14 +7,20 @@
 #define OUTPUT_COUNT 3
 
 int main(){   
-    Tensor b({3,2,2,2}, {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23}, {}, true);
-    Tensor c({3,2,2,2}, {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23}, {}, true);
-    Tensor x = b.concat(c, 3);
+    Tensor b({2,4}, {0,1,2,3,4,5,6,7}, {}, true);
+    Tensor c({4,2}, {0,1,2,3,4,5,6,7}, {}, true);
+    Tensor x = b.kron(c);
+    // x.printShape();
+    // x.printStrides();
+    // x.printStrides();
     x.printShape();
     x.printStrides();
-
-    for(unsigned i=0; i<x.totalLength; i++){
-        std::cout << x.getValues()[i] << ", ";
+    for(unsigned i=0; i<8; i++){
+        for(unsigned j=0; j<8; j++){
+            // for(unsigned k=0; k<4; k++){
+                std::cout << x({i,j}) << ", ";
+            // }
+        }
     }
     std::cout << std::endl;
     // b.printShape();
