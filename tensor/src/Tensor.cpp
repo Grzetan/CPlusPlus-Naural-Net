@@ -190,33 +190,49 @@ Tensor Tensor::permute(vector<size_t> dims){
 // }
 
 Tensor Tensor::kron(Tensor &b){
-    if(shape.size() == 2 && b.getShape().size() == 2){
-        //Calculate new shape
-        vector<size_t> _shape = shape;
-
-        unsigned i, j, index, index2, lastDimSize = shape[shape.size() - 1], 
-        bLastShape = b.getShape()[b.getShape().size() - 1];
-
-        for(i=0; i<_shape.size(); i++){
-            _shape[i] = _shape[i] * b.getShape()[i];
-        }    
-
-        vector<double> _values;
-        _values.resize(multiplyArr(_shape));
-
-        for(i=0; i<totalLength; i++){
-            index = (int)i/lastDimSize * lastDimSize * b.totalLength;
-            for(j=0; j<b.totalLength; j++){
-                index2 = index + (((int)j / bLastShape) * _shape[_shape.size() - 1]);
-                index2 = index2 + (i%lastDimSize * bLastShape) + j%bLastShape;
-                _values[index2] = values[i] * b.getValues()[j];
-            }
-        }
-        return Tensor(_shape, _values);
-    }else{
-        std::cout << "Kronecker multiplication can be performed only between matrixes" << std::endl;
+    //Check if tensors have equal shapes
+    if(shape.size() != b.getShape().size()){
+        std::cout << "To perform kronecker multiplication tensors must have the same number of dimensions" << std::endl;
         std::exit(0);
     }
+
+    //Calculate new shape
+    unsigned i, j, k, p;
+    vector<size_t> _shape = shape;
+    vector<size_t> other = b.getShape();
+
+    int max = shape.size();
+    if(b.getShape().size() > max){
+        max = b.getShape().size();
+    }
+    for(i=0; i<max - _shape.size(); i++){
+        _shape.insert(_shape.begin(), 1);
+    }
+    for(i=0; i<max - other.size(); i++){
+        other.insert(other.begin(), 1);
+    }
+    for(i=0; i<_shape.size(); i++){
+        _shape[i] = _shape[i] * other[i];
+    }    
+
+    Tensor result(_shape, 0);
+    vector<size_t> aComplexIndex(shape.size()), blockIndex(shape.size()), bComplexIndex(shape.size()), resultIndex(shape.size());
+    for(i=0; i<totalLength; i++){
+        aComplexIndex = linearToComplexIndex(i);
+        for(j=0; j<aComplexIndex.size(); j++){
+            blockIndex[j] = aComplexIndex[j] * other[j];
+        }
+        for(k=0; k<b.totalLength; k++){
+            bComplexIndex = b.linearToComplexIndex(k);
+            resultIndex = blockIndex;
+            for(p=0; p<bComplexIndex.size(); p++){
+                resultIndex[p] += bComplexIndex[p];
+            }
+            result(resultIndex) = values[i] * b.getValues()[k];
+        }
+    }
+
+    return result;
 }
 
 Tensor Tensor::concat(Tensor &b, size_t axis = 0){
