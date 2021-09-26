@@ -176,18 +176,29 @@ Tensor Tensor::permute(vector<size_t> dims){
     }
 }
 
-// Tensor Tensor::hadamartProduct(Tensor &b){
-//     if(b.getShape() == shape){
-//         vector<double> sum_vals(totalLength);
-//         for(unsigned i=0; i<totalLength; i++){
-//             sum_vals[i] = values[i] * b.getValues()[i];
-//         }
-//         return Tensor(shape, sum_vals);
-//     }else{
-//         this->invalidShape();
-//         std::exit(0);
-//     } 
-// }
+Tensor Tensor::matmul(Tensor &b){
+    if(shape[shape.size() - 1] == b.getShape()[b.getShape().size() - 2] && shape.size() == 2 && b.getShape().size() == 2){
+        vector<size_t> _shape = shape;
+        _shape[shape.size() - 1] = b.getShape()[shape.size() - 1];
+        vector<double> _values;
+        _values.reserve(multiplyArr(_shape));
+        unsigned i,j,k;
+        double sum;
+        for(i=0; i<shape[0]; i++){
+            for(j=0; j<b.getShape()[1]; j++){
+                sum = 0;
+                for(k=0; k<shape[1]; k++){
+                    sum += this->operator()({i,k}) * b({k,j});
+                }
+                _values.push_back(sum);
+            }
+        }
+        return Tensor(_shape, _values);
+    }else{
+        std::cout << "Make sure that tensors have 2 dimensions and column count in first tensor == row count in second tensor" << std::endl;
+        std::exit(0);
+    }
+}
 
 Tensor Tensor::kron(Tensor &b){
     //Check if tensors have equal shapes
@@ -309,6 +320,26 @@ Tensor Tensor::unsquezze(){
     _shape.insert(_shape.begin(), 1);
 
     return Tensor(_shape, _values);
+}
+
+Tensor Tensor::squezze(){
+    if(shape[0] == 1){
+        vector<double> _values;    
+
+        if(!contiguous){
+            _values = copyValuesByStrides();
+        }else{
+            _values = values;
+        }
+
+        vector<size_t> _shape = shape;
+        _shape.erase(_shape.begin());
+
+        return Tensor(_shape, _values);
+    }else{
+        std::cout << "Cannot squeeze tensor if first dimension != 1" << std::endl;
+        std::exit(0);
+    }
 }
 
 double Tensor::max(){

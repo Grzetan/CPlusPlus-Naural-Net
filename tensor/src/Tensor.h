@@ -33,12 +33,13 @@ public:
     Tensor swapaxes(size_t, size_t);
     Tensor transpose();
     Tensor permute(vector<size_t>);
-    Tensor hadamartProduct(Tensor &);
+    Tensor matmul(Tensor &);
     Tensor kron(Tensor &);
     Tensor concat(Tensor &, size_t);
     Tensor flatten();
     Tensor reshape(vector<size_t>);
     Tensor unsquezze();
+    Tensor squezze();
     double max();
     double min();
 
