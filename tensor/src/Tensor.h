@@ -54,6 +54,7 @@ public:
     Tensor operator[](vector<size_t>);
     // void operator=(Tensor&);
     vector<size_t> getShape();
+    size_t dimCount();
     vector<double>& getValues();
 
     //Other methods

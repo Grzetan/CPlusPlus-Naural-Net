@@ -401,6 +401,10 @@ vector<size_t> Tensor::getShape(){
     return shape;
 }
 
+size_t Tensor::dimCount(){
+    return shape.size();
+}
+
 vector<double>& Tensor::getValues(){
     return values;
 }
