@@ -7,80 +7,103 @@
 #include "assets.h"
 
 IrisDataset::IrisDataset(const char* path){
-    INPUT_COUNT = 4;
-    OUTPUT_COUNT = 3;
     PATH = (char *)path;
     file = NULL;
-    TRAIN_COUNT = 80;
-    TEST_COUNT = 35;
-    VALIDATION_COUNT = 35;
-}
 
-Tensor IrisDataset::trainingSet(unsigned int index){
-    if(index > TRAIN_COUNT){
-        this->indexOutOfRange();
-        std::exit(0);
+    //Shuffle samples
+    srand(time(NULL));
+    int i, tempIndex;
+
+    for(i=0; i<TOTAL_COUNT; i++){
+        indexes[i] = i;
     }
-    Tensor c = this->getSample(index);
-
-    Tensor b({1,1},1);
-    return b;
-}
-
-Tensor IrisDataset::testSet(unsigned int index){
-    if(index > TEST_COUNT){
-        this->indexOutOfRange();
-        std::exit(0);
+    for(i=TOTAL_COUNT - 1; i>0; i--){
+        tempIndex = rand() % i;
+        std::swap(indexes[i], indexes[tempIndex]);
     }
-    index = TRAIN_COUNT + index;
-
-    Tensor b({1,1},1);
-    return b;
-    // return this->getSample(index);
 }
 
-Tensor IrisDataset::validationSet(unsigned int index){
-    if(index > VALIDATION_COUNT){
-        this->indexOutOfRange();
-        std::exit(0);
+void IrisDataset::setType(IrisDataset::Sets type){
+    samples = vector<unsigned>();
+    int start, end, i;
+    switch(type){
+        case TRAIN:
+            start = 0;
+            end = TRAIN_COUNT;
+            samples.reserve(TRAIN_COUNT);
+            break;
+        case TEST:
+            start = TRAIN_COUNT;
+            end = TRAIN_COUNT + TEST_COUNT;
+            samples.reserve(TEST_COUNT);
+            break;
+        case VALIDATION:
+            start = TRAIN_COUNT + TEST_COUNT;
+            end = TRAIN_COUNT + TEST_COUNT + VALIDATION_COUNT;
+            samples.reserve(VALIDATION_COUNT);
+            break;
     }
-    index = TRAIN_COUNT + TEST_COUNT + index;
 
-    Tensor b({1,1},1);
-    return b;
-    // return this->getSample(index);
+    for(i=start; i<end; i++){
+        samples.push_back(indexes[i]);
+    }
 }
 
-Tensor IrisDataset::getSample(unsigned int seek){    
+IrisDataset::Sample IrisDataset::getSample(unsigned int sample){    
     if(file != NULL){
-        fseek(file, seek, SEEK_SET);
+        if(sample > samples.size()){
+            this->indexOutOfRange();
+            std::exit(0);
+        }
+        sample = samples[sample];
         char * line = NULL;
         size_t len = 0;
-        getline(&line, &len, file); 
-
+        unsigned i = 0;
+        fseek(file, 0, SEEK_SET);
+        while(getline(&line, &len, file)){
+            if(i == sample){
+                break;
+            }
+            i++;
+        }        
         //Write values to Tensor and extract class
-        Tensor input({1, INPUT_COUNT}, 0);
-        int cls = 0;
+        Tensor data({INPUT_COUNT}, 0);
+        Tensor label;
+        size_t cls = 0;
         char * splited = strtok(line, ",");
         size_t num = 0;
         while(splited != NULL){
-            if(num >= INPUT_COUNT){
+            if(num == INPUT_COUNT){
                 cls = this->classNameToIndex(splited);
-            }else{
-                input({0, num}) = atof(splited);
+                Tensor output({OUTPUT_COUNT}, 0);
+                output({cls - 1}) = 1;
+                label = output;
+            }else if(num < INPUT_COUNT){
+                data({num}) = atof(splited);
             }
             num++;
             splited = strtok(NULL, ",");
         }
-
+        return {data, label};
     }else{
         file = fopen(PATH, "r");
         assert(file != NULL);
-        this->getSample(seek);
+        return this->getSample(sample);
+    }
+}
+
+IrisDataset::Sample IrisDataset::getSet(){
+    unsigned i;
+    Tensor inputs({samples.size(), INPUT_COUNT}, 0);
+    Tensor labels({samples.size(), OUTPUT_COUNT}, 0);
+
+    for(i=0; i< samples.size(); i++){
+        IrisDataset::Sample sample = this->getSample(i);
+        inputs.insertTensor({i},sample.data);
+        labels.insertTensor({i},sample.labels);
     }
 
-    Tensor b({1,1},1);
-    return b;
+    return {inputs, labels};
 }
 
 void IrisDataset::closeDataset(){

@@ -23,6 +23,7 @@ public:
     size_t totalLength;
     bool contiguous = true;
 
+    Tensor();
     Tensor(vector<size_t>, vector<double>, vector<size_t>, bool);
     Tensor(vector<size_t>, double);
 
@@ -30,6 +31,7 @@ public:
     Tensor operator+(Tensor &);
     Tensor operator-(Tensor &);
     Tensor operator*(Tensor &);
+    void insertTensor(vector<size_t>, Tensor &);
     Tensor swapaxes(size_t, size_t);
     Tensor transpose();
     Tensor permute(vector<size_t>);

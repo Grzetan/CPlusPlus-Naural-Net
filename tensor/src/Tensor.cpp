@@ -1,5 +1,9 @@
 #include "Tensor.h"
 
+Tensor::Tensor(){
+    
+}
+
 Tensor::Tensor(vector<size_t> _shape, double fill){
     this->shape = _shape;
     this->generateStrides();
@@ -436,6 +440,18 @@ Tensor Tensor::operator[](vector<size_t> pos){
     vector<double> _values = vector<double>(values.begin() + startingIndex, values.begin() + endingIndex + 1);
     vector<size_t> _shape = vector<size_t>(shape.begin() + pos.size(), shape.end());
     return Tensor(_shape, _values);
+}
+
+void Tensor::insertTensor(vector<size_t> index, Tensor& b){
+    if(b.getShape() != vector<size_t>(shape.begin() + index.size(), shape.end())){
+        this->invalidIndex();
+        std::exit(0);
+    }else{
+        size_t startIndex = this->complexIndexToLinearIndex(index);
+        for(unsigned i=0; i<b.totalLength; i++){
+            values[startIndex + i] = b.getValues()[i];
+        }
+    }
 }
 
 //Other methods

@@ -1,33 +1,40 @@
 #include <iostream>
 #include "Tensor.h"
 #include <chrono>
-// #include "assets.h"
-// #include "dataset.h"
+#include "assets.h"
+#include "dataset.h"
 
 #define OUTPUT_COUNT 3
 
 int main(){   
-    Tensor b({8,2}, {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}, {}, true);
-    Tensor c({2,4}, {0,1,2,3,4,5,6,7}, {}, true);
-    Tensor x = b.matmul(c);
-    x.printShape();
-    x.printStrides();
-    for(unsigned i=0; i<8; i++){
-        for(unsigned j=0; j<4; j++){
-            // for(unsigned k=0; k<4; k++){
-                std::cout << x({i,j}) << ", ";
-            // }
-        }
-    }
-    std::cout << std::endl;
-    // b.printShape();
-    // std::cout << a({1}) << std::endl;
-    
+    // Tensor b({3}, 3);
+    // Tensor a({3}, 4);
+    // b.insertTensor({0}, a);
 
-    // Tensor cls = Tensor({3,2,2}, 3);
-    // Tensor x = cls - 5.5;
-    // std::cout << x({0,0,0});
-    // std::cout << x({0,0,1});
+    // for(unsigned i=0; i<3; i++){
+    //     // for(unsigned j=0; j<3; j++){
+    //         std::cout << b({i}) << ", ";
+    //     // }
+    //     std::cout << std::endl;
+    // }
+    IrisDataset dataset("dataset/iris.data");
+    dataset.setType(IrisDataset::TRAIN);
+    IrisDataset::Sample sample = dataset.getSet();
+    sample.data.printShape();
+    sample.labels.printShape();
+    for(size_t i=0; i<80; i++){
+        for(size_t j=0; j<4; j++){
+            std::cout << sample.data({i,j}) << ", ";
+        }
+        std::cout << std::endl;
+    }
+
+    for(size_t i=0; i<80; i++){
+        for(size_t j=0; j<3; j++){
+            std::cout << sample.labels({i,j}) << ", ";
+        }
+        std::cout << std::endl;
+    }
     
     return 0;
 }

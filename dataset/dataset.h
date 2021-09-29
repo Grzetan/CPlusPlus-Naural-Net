@@ -5,34 +5,42 @@
 #include "Tensor.h"
 
 class IrisDataset{
-private:
-    char* PATH;
-    std::FILE *file;
-
-    enum LINE_LENGTHS {
-        FIRST_CLASS = 28, SECOND_CLASS = 32, THRIRD_CLASS = 31
+public:
+    enum Sets{
+        TRAIN, TEST, VALIDATION
     };
 
-    Tensor getSample(unsigned int);
-
-public:
-    size_t INPUT_COUNT;
-    size_t OUTPUT_COUNT;
-    size_t TRAIN_COUNT;
-    size_t TEST_COUNT;
-    size_t VALIDATION_COUNT;
-
-    IrisDataset(const char*);
-
-    //Sets
-    Tensor trainingSet(unsigned int);
-    Tensor testSet(unsigned int);
-    Tensor validationSet(unsigned int);
-    void closeDataset();
-
-    int classNameToIndex(char *);
+    struct Sample{
+        Tensor data;
+        Tensor labels;
+    };
+private:
+    char* PATH;
+    size_t INPUT_COUNT = 4;
+    size_t OUTPUT_COUNT = 3;
+    std::FILE *file;
+    unsigned indexes[150];
+    Sets usedType;
+    vector<unsigned> samples;
+    unsigned batchSize;
 
     //Exception
     void indexOutOfRange();
     void classNotFound();
+
+public:
+    size_t TRAIN_COUNT = 80;
+    size_t TEST_COUNT = 35;
+    size_t VALIDATION_COUNT = 35;
+    size_t TOTAL_COUNT = 150;
+
+    IrisDataset(const char*);
+
+    //Sets
+    Sample getSample(unsigned int);
+    Sample getSet();
+    void setType(Sets);
+    void closeDataset();
+
+    int classNameToIndex(char *);
 };
