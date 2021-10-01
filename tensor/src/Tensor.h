@@ -14,8 +14,6 @@ private:
     void invalidShape();
     void invalidIndex();
     void invalidAxis();
-    size_t complexIndexToLinearIndex(vector<size_t>);
-    vector<size_t> linearToComplexIndex(size_t);
     void generateStrides();
     vector<double> copyValuesByStrides();
 
@@ -62,4 +60,6 @@ public:
     //Other methods
     void printShape();
     void printStrides();
+    size_t complexIndexToLinearIndex(vector<size_t>);
+    vector<size_t> linearToComplexIndex(size_t);
 };
