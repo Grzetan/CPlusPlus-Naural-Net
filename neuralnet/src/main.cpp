@@ -22,19 +22,10 @@ int main(){
     IrisDataset::Sample sample = dataset.getSet();
     sample.data.printShape();
     sample.labels.printShape();
+    Tensor a = output_to_class(sample.labels);
     for(size_t i=0; i<80; i++){
-        for(size_t j=0; j<4; j++){
-            std::cout << sample.data({i,j}) << ", ";
-        }
-        std::cout << std::endl;
+        std::cout << a({i}) << ", ";
     }
 
-    for(size_t i=0; i<80; i++){
-        for(size_t j=0; j<3; j++){
-            std::cout << sample.labels({i,j}) << ", ";
-        }
-        std::cout << std::endl;
-    }
-    
     return 0;
 }

@@ -23,7 +23,8 @@ IrisDataset::IrisDataset(const char* path){
     }
 }
 
-void IrisDataset::setType(IrisDataset::Sets type){
+void IrisDataset::setType(IrisDataset::Sets type, bool _bias = false){
+    bias = _bias;
     samples = vector<unsigned>();
     int start, end, i;
     switch(type){

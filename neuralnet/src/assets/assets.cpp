@@ -16,7 +16,7 @@ Tensor output_to_class(Tensor &output){
                 maxIndex = j;
             }
         }
-        result({i,0}) = maxIndex + 1;
+        result({i}) = maxIndex + 1;
     }
     return result;
 }

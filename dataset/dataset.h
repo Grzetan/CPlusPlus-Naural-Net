@@ -16,11 +16,10 @@ public:
     };
 private:
     char* PATH;
-    size_t INPUT_COUNT = 4;
-    size_t OUTPUT_COUNT = 3;
     std::FILE *file;
     unsigned indexes[150];
     Sets usedType;
+    bool bias;
     vector<unsigned> samples;
     unsigned batchSize;
 
@@ -28,18 +27,21 @@ private:
     void indexOutOfRange();
     void classNotFound();
 
-public:
+protected:
+    size_t INPUT_COUNT = 4;
+    size_t OUTPUT_COUNT = 3;
     size_t TRAIN_COUNT = 80;
     size_t TEST_COUNT = 35;
     size_t VALIDATION_COUNT = 35;
     size_t TOTAL_COUNT = 150;
 
+public:
     IrisDataset(const char*);
 
     //Sets
     Sample getSample(unsigned int);
     Sample getSet();
-    void setType(Sets);
+    void setType(Sets, bool);
     void closeDataset();
 
     int classNameToIndex(char *);
