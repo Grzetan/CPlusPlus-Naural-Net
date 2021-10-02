@@ -21,6 +21,8 @@ int main(){
         }
     }
     std::cout << std::endl;
+    srand(time(NULL));
+    std::cout << rand() % 6;
 
     // IrisDataset dataset("dataset/iris.data");
     // dataset.setType(IrisDataset::TRAIN, true);
