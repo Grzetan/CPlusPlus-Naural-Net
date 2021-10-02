@@ -278,13 +278,15 @@ Tensor Tensor::concat(Tensor &b, size_t axis = 0){
     if(!b.contiguous){
         copiedValuesB = b.copyValuesByStrides();
     }
-
-    size_t step = multiplyArr(vector<size_t>(shape.begin() + axis, shape.end()));
-    for(i=0; i<multiplyArr(vector<size_t>(shape.begin(), shape.begin() + axis)); i++){
-        for(j=i*step; j<i*step+step; j++){
+    size_t stepA = multiplyArr(vector<size_t>(shape.begin() + axis, shape.end()));
+    vector<size_t> shapeB = b.getShape();
+    size_t stepB = multiplyArr(vector<size_t>(shapeB.begin() + axis, shapeB.end()));
+    size_t range = multiplyArr(vector<size_t>(shape.begin(), shape.begin() + axis));
+    for(i=0; i<range; i++){
+        for(j=i*stepA; j<i*stepA+stepA; j++){
             _values.push_back(copiedValues[j]);
         }
-        for(j=i*step; j<i*step+step; j++){
+        for(j=i*stepB; j<i*stepB+stepB; j++){
             _values.push_back(copiedValuesB[j]);
         }
     }

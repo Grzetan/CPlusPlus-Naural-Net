@@ -30,3 +30,11 @@ Tensor Net::weightInit(vector<size_t> shape, unsigned maxWeight){
     }
     return output;
 }
+
+Net::FeedForwardResult Net::feedForward(Tensor& input, Tensor& weights){
+    Tensor bias({input.getShape()[0], 1}, 1);
+    Tensor b = input.concat(bias,1);
+    Tensor net = weights * b;
+    Tensor output = tanH(net);
+    return {net, output};
+}
