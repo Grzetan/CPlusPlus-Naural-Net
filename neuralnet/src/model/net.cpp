@@ -21,11 +21,12 @@ Tensor Net::DerivativetanH(Tensor& input){
     return output;  
 }
 
-Tensor Net::weightInit(vector<size_t> shape, unsigned maxWeight){
+Tensor Net::weightInit(vector<size_t> shape, double maxWeight){
     Tensor output(shape, 0);
     srand(time(NULL));
     for(unsigned i=0; i<output.totalLength; i++){
-        output(output.linearToComplexIndex(i)) = (2*maxWeight) % rand() - maxWeight;
+        double f = (double)rand() / RAND_MAX;
+        output(output.linearToComplexIndex(i)) = f * (2 * maxWeight) - maxWeight;
     }
     return output;
 }

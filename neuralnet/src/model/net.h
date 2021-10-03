@@ -17,7 +17,7 @@ namespace Net{
 
     Tensor tanH(Tensor&);
     Tensor DerivativetanH(Tensor&);
-    Tensor weightInit(vector<size_t>, unsigned);
+    Tensor weightInit(vector<size_t>, double);
     FeedForwardResult feedForward(Tensor&, Tensor&, Tensor&);
     EvaluateErrors evaluate(Tensor&, Tensor&, Tensor&, Tensor&, Tensor&);
 }

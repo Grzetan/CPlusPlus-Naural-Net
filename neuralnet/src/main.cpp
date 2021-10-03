@@ -12,7 +12,7 @@ int main(){
     IrisDataset dataset("dataset/iris.data");
     dataset.setType(IrisDataset::TRAIN, true);
     IrisDataset::Sample set = dataset.getSet();
-    Tensor weights = Net::weightInit({5,3}, 3);
+    Tensor weights = Net::weightInit({5,3}, 0.5);
     Tensor bias({set.data.getShape()[0],1}, 1);
     Tensor targetCls = output_to_class(set.labels);
     Net::EvaluateErrors errors = Net::evaluate(set.data, weights, set.labels, targetCls, bias);
