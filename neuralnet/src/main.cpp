@@ -9,31 +9,14 @@
 #define OUTPUT_COUNT 3
 
 int main(){   
-    Tensor b({3,3}, 3);
-    // Tensor c = Net::tanH(b);
-    // Tensor x = Net::DerivativetanH(c);
-    // c.printShape();
-    // for(unsigned i=0; i<3; i++){
-    //     for(unsigned j=0; j<3; j++){
-    //         for(unsigned k=0; k<3; k++){
-    //             std::cout << x({i,j,k}) << ", ";
-    //         }
-    //     }
-    // }
-    Tensor weights = Net::weightInit({3,4}, 3);
-    Net::FeedForwardResult result = Net::feedForward(b, weights);
-    result.net.printShape();
-    result.output.printShape();
-
-    // IrisDataset dataset("dataset/iris.data");
-    // dataset.setType(IrisDataset::TRAIN, true);
-    // IrisDataset::Sample sample = dataset.getSet();
-    // sample.data.printShape();
-    // sample.labels.printShape();
-    // Tensor a = output_to_class(sample.labels);
-    // for(size_t i=0; i<80; i++){
-    //     std::cout << a({i}) << ", ";
-    // }
+    IrisDataset dataset("dataset/iris.data");
+    dataset.setType(IrisDataset::TRAIN, true);
+    IrisDataset::Sample set = dataset.getSet();
+    Tensor weights = Net::weightInit({5,3}, 3);
+    Tensor bias({set.data.getShape()[0],1}, 1);
+    Tensor targetCls = output_to_class(set.labels);
+    Net::EvaluateErrors errors = Net::evaluate(set.data, weights, set.labels, targetCls, bias);
+    std::cout << errors.outputError << ", " << errors.classificationError << std::endl;
 
     return 0;
 }

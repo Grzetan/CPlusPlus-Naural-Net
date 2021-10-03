@@ -80,7 +80,7 @@ IrisDataset::Sample IrisDataset::getSample(unsigned int sample){
                 output({cls - 1}) = 1;
                 label = output;
             }else if(num < INPUT_COUNT){
-                data({num}) = atof(splited);
+                data({num}) = atof(splited) / 8;
             }
             num++;
             splited = strtok(NULL, ",");

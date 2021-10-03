@@ -1,5 +1,4 @@
 #include "net.h"
-#include <math.h>
 
 Tensor Net::tanH(Tensor& input){
     Tensor output({input.getShape()}, 0);
@@ -31,10 +30,24 @@ Tensor Net::weightInit(vector<size_t> shape, unsigned maxWeight){
     return output;
 }
 
-Net::FeedForwardResult Net::feedForward(Tensor& input, Tensor& weights){
-    Tensor bias({input.getShape()[0], 1}, 1);
+Net::FeedForwardResult Net::feedForward(Tensor& input, Tensor& weights, Tensor& bias){
     Tensor b = input.concat(bias,1);
-    Tensor net = weights * b;
+    Tensor net = b.matmul(weights);
     Tensor output = tanH(net);
     return {net, output};
+}
+
+Net::EvaluateErrors Net::evaluate(Tensor& input, Tensor& weights, Tensor& targetOutput, Tensor& targetClass, Tensor& bias){
+    unsigned sampleCount = input.getShape()[0];
+    FeedForwardResult result = feedForward(input, weights, bias);
+    double outputError = (targetOutput - result.output).square().sum() / (sampleCount * targetOutput.getShape()[1]);
+    Tensor classes = output_to_class(result.output);
+    Tensor clsErrorT({sampleCount}, 0);
+    for(unsigned i=0; i<sampleCount; i++){
+        if(classes({i}) != targetClass({i})){
+            clsErrorT({i}) = 1;
+        }
+    }
+    double clsError = clsErrorT.sum() / sampleCount;
+    return {outputError, clsError};
 }

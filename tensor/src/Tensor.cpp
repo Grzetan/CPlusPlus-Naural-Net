@@ -348,6 +348,22 @@ Tensor Tensor::squezze(){
     }
 }
 
+Tensor Tensor::square(){
+    vector<double> _values = values;
+    for(unsigned i=0; i<totalLength; i++){
+        _values[i] = _values[i] * _values[i];
+    }
+    return Tensor(shape, _values);
+}
+
+double Tensor::sum(){
+    double sum = 0;
+    for(unsigned i=0; i<totalLength; i++){
+        sum += values[i];
+    }
+    return sum;
+}
+
 double Tensor::max(){
     double max = values[0];
     for(unsigned i=0; i<totalLength; i++){

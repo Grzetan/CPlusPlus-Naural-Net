@@ -40,6 +40,8 @@ public:
     Tensor reshape(vector<size_t>);
     Tensor unsquezze();
     Tensor squezze();
+    Tensor square();
+    double sum();
     double max();
     double min();
 
