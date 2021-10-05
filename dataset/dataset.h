@@ -26,14 +26,13 @@ private:
     //Exception
     void indexOutOfRange();
     void classNotFound();
-
-protected:
-    size_t INPUT_COUNT = 4;
-    size_t OUTPUT_COUNT = 3;
-    size_t TRAIN_COUNT = 80;
-    size_t TEST_COUNT = 35;
-    size_t VALIDATION_COUNT = 35;
-    size_t TOTAL_COUNT = 150;
+     
+    static const size_t INPUT_COUNT = 4;
+    static const size_t OUTPUT_COUNT = 3;
+    static const size_t TRAIN_COUNT = 80;
+    static const size_t TEST_COUNT = 35;
+    static const size_t VALIDATION_COUNT = 35;
+    static const size_t TOTAL_COUNT = 150;
 
 public:
     IrisDataset(const char*);
@@ -44,5 +43,7 @@ public:
     void setType(Sets, bool);
     void closeDataset();
 
-    int classNameToIndex(char *);
+    unsigned classNameToIndex(char *);
+    static size_t inputCount();
+    static size_t outputCount();
 };

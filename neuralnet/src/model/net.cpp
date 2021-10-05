@@ -52,3 +52,56 @@ Net::EvaluateErrors Net::evaluate(Tensor& input, Tensor& weights, Tensor& target
     double clsError = clsErrorT.sum() / sampleCount;
     return {outputError, clsError};
 }
+
+Tensor Net::backpropagation(Tensor& input, Tensor& weights, double lr, Tensor& bias){
+    return weights;
+}
+
+Net::TrainResult Net::train(IrisDataset::Sample& trainingSamples, IrisDataset::Sample& testSamples, IrisDataset::Sample& validationSamples){
+    bool PLOT = true;
+    Tensor weights = Net::weightInit({IrisDataset::inputCount() + 1, IrisDataset::outputCount()}, 0.5);
+    Tensor trainBias({trainingSamples.data.getShape()[0], 1}, 1);
+    Tensor testBias({testSamples.data.getShape()[0], 1}, 1);
+    Tensor validationBias({validationSamples.data.getShape()[0], 1}, 1);
+
+    Tensor error({500, 6},0);
+    unsigned i=0;
+
+    while(i<500){
+        weights = backpropagation(trainingSamples.data, weights, 0.1, trainBias);
+
+        if(PLOT){
+            Tensor targetTrainCls = output_to_class(trainingSamples.labels);
+            EvaluateErrors trainErrors = evaluate(trainingSamples.data, weights, trainingSamples.labels, targetTrainCls, trainBias);
+
+            Tensor targetTestCls = output_to_class(testSamples.labels);
+            EvaluateErrors testErrors = evaluate(testSamples.data, weights, testSamples.labels, targetTestCls, testBias);
+            
+            Tensor targetValidationCls = output_to_class(validationSamples.labels);
+            EvaluateErrors validationErrors = evaluate(validationSamples.data, weights, validationSamples.labels, targetValidationCls, validationBias);
+            error({i, 0}) = trainErrors.outputError;
+            error({i, 1}) = trainErrors.classificationError;
+            error({i, 2}) = testErrors.outputError;
+            error({i, 3}) = testErrors.classificationError;
+            error({i, 4}) = validationErrors.outputError;
+            error({i, 5}) = validationErrors.classificationError;
+        }
+
+        i++;
+    }
+
+    if(PLOT){
+        //Plot graph
+    }
+
+    Tensor targetTrainCls = output_to_class(trainingSamples.labels);
+    EvaluateErrors trainErrors = evaluate(trainingSamples.data, weights, trainingSamples.labels, targetTrainCls, trainBias);
+
+    Tensor targetTestCls = output_to_class(testSamples.labels);
+    EvaluateErrors testErrors = evaluate(testSamples.data, weights, testSamples.labels, targetTestCls, testBias);
+    
+    Tensor targetValidationCls = output_to_class(validationSamples.labels);
+    EvaluateErrors validationErrors = evaluate(validationSamples.data, weights, validationSamples.labels, targetValidationCls, validationBias);
+
+    return {weights, trainErrors.outputError, trainErrors.classificationError, testErrors.outputError, testErrors.classificationError, validationErrors.outputError, validationErrors.classificationError};
+}

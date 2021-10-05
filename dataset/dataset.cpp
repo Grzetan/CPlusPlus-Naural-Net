@@ -127,7 +127,7 @@ void IrisDataset::closeDataset(){
     fclose(file);
 }
 
-int IrisDataset::classNameToIndex(char * str){
+unsigned IrisDataset::classNameToIndex(char * str){
     if(strstr(str, "Iris-setosa") != NULL){
         return 1;
     }else if(strstr(str, "Iris-versicolor") != NULL){
@@ -154,4 +154,12 @@ void IrisDataset::classNotFound(){
     }catch(std::invalid_argument error){
         std::cout << error.what() << std::endl;
     }  
+}
+
+size_t IrisDataset::inputCount(){
+    return INPUT_COUNT;
+}
+
+size_t IrisDataset::outputCount(){
+    return OUTPUT_COUNT;
 }
